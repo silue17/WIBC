@@ -19,7 +19,8 @@ class TeamController extends Controller
             'name'     => 'required|string|max:300',
             'position' => 'nullable|string|max:300',
             'bio'      => 'nullable|string|max:2000',
-            'photo'    => 'nullable|string', // base64 ou URL
+            'photo'    => 'nullable|string',
+            'social'   => 'nullable|array',
         ]);
 
         $data['sort_order'] = TeamMember::max('sort_order') + 1;
@@ -35,11 +36,12 @@ class TeamController extends Controller
             'position' => 'nullable|string|max:300',
             'bio'      => 'nullable|string|max:2000',
             'photo'    => 'nullable|string',
+            'social'   => 'nullable|array',
         ]);
 
         $teamMember->update($data);
 
-        return response()->json($teamMember);
+        return response()->json($teamMember->fresh());
     }
 
     public function destroy(TeamMember $teamMember)

@@ -736,19 +736,28 @@
             border-radius: 24px;
             width: 100%;
             max-width: 480px;
-            padding: 28px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
             animation: scaleUp 0.2s cubic-bezier(0.2,0.9,0.4,1.1);
             box-shadow: 0 30px 60px rgba(7,16,42,0.25);
             border: 1px solid var(--border-light);
+            overflow: hidden;
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 22px;
-            padding-bottom: 16px;
+            padding: 24px 28px 16px;
             border-bottom: 1px solid var(--border-light);
+            flex-shrink: 0;
+        }
+
+        #modalBody {
+            overflow-y: auto;
+            padding: 28px;
+            flex: 1;
         }
 
         .modal-header h3 { font-size: 1rem; font-weight: 800; }
@@ -769,7 +778,7 @@
 
         .close-modal:hover { background: var(--red-soft); color: var(--red); }
 
-        .modal-content .field-group { margin-bottom: 16px; }
+        #modalBody .field-group { margin-bottom: 16px; }
 
         /* ── TOAST ── */
         .toast-notify {

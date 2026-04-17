@@ -136,6 +136,25 @@
                 <label class="field-label"><i class="fas fa-comment"></i> Bio</label>
                 <textarea id="mBio" class="field-input" rows="3">${escapeHtml(m.bio||'')}</textarea>
             </div>
+            <div style="border-top:1px solid var(--border-light);margin:16px 0 14px;padding-top:16px;">
+                <div style="font-size:0.78rem;font-weight:700;color:var(--text-muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.8px;"><i class="fas fa-share-alt"></i> Réseaux sociaux</div>
+                <div class="field-group" style="margin-bottom:10px;">
+                    <label class="field-label"><i class="fab fa-linkedin-in" style="color:#0077b5;"></i> LinkedIn</label>
+                    <input id="mLinkedin" class="field-input" type="url" value="${escapeHtml(m.social?.linkedin||'')}" placeholder="https://linkedin.com/in/...">
+                </div>
+                <div class="field-group" style="margin-bottom:10px;">
+                    <label class="field-label"><i class="fab fa-instagram" style="color:#e1306c;"></i> Instagram</label>
+                    <input id="mInstagram" class="field-input" type="url" value="${escapeHtml(m.social?.instagram||'')}" placeholder="https://instagram.com/...">
+                </div>
+                <div class="field-group" style="margin-bottom:10px;">
+                    <label class="field-label"><i class="fab fa-facebook-f" style="color:#1877f2;"></i> Facebook</label>
+                    <input id="mFacebook" class="field-input" type="url" value="${escapeHtml(m.social?.facebook||'')}" placeholder="https://facebook.com/...">
+                </div>
+                <div class="field-group" style="margin-bottom:0;">
+                    <label class="field-label"><i class="fab fa-twitter" style="color:#1a8cd8;"></i> Twitter / X</label>
+                    <input id="mTwitter" class="field-input" type="url" value="${escapeHtml(m.social?.twitter||'')}" placeholder="https://twitter.com/...">
+                </div>
+            </div>
             <button id="modalSaveBtn" class="btn-primary" style="width:100%;justify-content:center;margin-top:4px;">
                 <i class="fas fa-save"></i> Enregistrer
             </button>`,
@@ -144,6 +163,12 @@
                     name:     document.getElementById('mName').value,
                     position: document.getElementById('mPos').value,
                     bio:      document.getElementById('mBio').value,
+                    social: {
+                        linkedin:  document.getElementById('mLinkedin').value.trim(),
+                        instagram: document.getElementById('mInstagram').value.trim(),
+                        facebook:  document.getElementById('mFacebook').value.trim(),
+                        twitter:   document.getElementById('mTwitter').value.trim(),
+                    },
                 };
                 if (pendingPhoto !== null) payload.photo = pendingPhoto;
                 try {
@@ -230,6 +255,25 @@
                 <label class="field-label"><i class="fas fa-comment"></i> Bio</label>
                 <textarea id="mBio" class="field-input" rows="3"></textarea>
             </div>
+            <div style="border-top:1px solid var(--border-light);margin:16px 0 14px;padding-top:16px;">
+                <div style="font-size:0.78rem;font-weight:700;color:var(--text-muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.8px;"><i class="fas fa-share-alt"></i> Réseaux sociaux</div>
+                <div class="field-group" style="margin-bottom:10px;">
+                    <label class="field-label"><i class="fab fa-linkedin-in" style="color:#0077b5;"></i> LinkedIn</label>
+                    <input id="mLinkedin" class="field-input" type="url" placeholder="https://linkedin.com/in/...">
+                </div>
+                <div class="field-group" style="margin-bottom:10px;">
+                    <label class="field-label"><i class="fab fa-instagram" style="color:#e1306c;"></i> Instagram</label>
+                    <input id="mInstagram" class="field-input" type="url" placeholder="https://instagram.com/...">
+                </div>
+                <div class="field-group" style="margin-bottom:10px;">
+                    <label class="field-label"><i class="fab fa-facebook-f" style="color:#1877f2;"></i> Facebook</label>
+                    <input id="mFacebook" class="field-input" type="url" placeholder="https://facebook.com/...">
+                </div>
+                <div class="field-group" style="margin-bottom:0;">
+                    <label class="field-label"><i class="fab fa-twitter" style="color:#1a8cd8;"></i> Twitter / X</label>
+                    <input id="mTwitter" class="field-input" type="url" placeholder="https://twitter.com/...">
+                </div>
+            </div>
             <button id="modalSaveBtn" class="btn-primary" style="width:100%;justify-content:center;margin-top:4px;">
                 <i class="fas fa-plus"></i> Créer
             </button>`,
@@ -239,6 +283,12 @@
                         name:     document.getElementById('mName').value,
                         position: document.getElementById('mPos').value,
                         bio:      document.getElementById('mBio').value,
+                        social: {
+                            linkedin:  document.getElementById('mLinkedin').value.trim(),
+                            instagram: document.getElementById('mInstagram').value.trim(),
+                            facebook:  document.getElementById('mFacebook').value.trim(),
+                            twitter:   document.getElementById('mTwitter').value.trim(),
+                        },
                     });
                     members.push(created);
                     renderTeam();

@@ -1932,10 +1932,18 @@ function fmtDate($d) {
                         @endif
                         <div class="team-action-row">
                             <div class="team-socials">
-                                <a href="#" class="soc-linkedin" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                                <a href="#" class="soc-instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
-                                <a href="#" class="soc-facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#" class="soc-twitter" title="X / Twitter"><i class="fab fa-twitter"></i></a>
+                                @if(!empty($member->social['linkedin']))
+                                <a href="{{ $member->social['linkedin'] }}" target="_blank" rel="noopener" class="soc-linkedin" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                                @endif
+                                @if(!empty($member->social['instagram']))
+                                <a href="{{ $member->social['instagram'] }}" target="_blank" rel="noopener" class="soc-instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
+                                @endif
+                                @if(!empty($member->social['facebook']))
+                                <a href="{{ $member->social['facebook'] }}" target="_blank" rel="noopener" class="soc-facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                                @endif
+                                @if(!empty($member->social['twitter']))
+                                <a href="{{ $member->social['twitter'] }}" target="_blank" rel="noopener" class="soc-twitter" title="X / Twitter"><i class="fab fa-twitter"></i></a>
+                                @endif
                             </div>
                             <a href="#contact" class="team-btn">En savoir plus</a>
                         </div>
