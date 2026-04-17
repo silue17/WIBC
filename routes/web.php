@@ -2,12 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\SiteController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\AchievementController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\GalleryController;
+use App\Http\Middleware\AdminAuth;
 
 // ── Site public ──────────────────────────────────────────────────────────
 Route::get('/', [PageController::class, 'index']);
@@ -15,8 +17,13 @@ Route::get('/actualites', [PageController::class, 'newsPage']);
 Route::get('/actualites/{id}', [PageController::class, 'newsDetail']);
 Route::get('/actualites/{id}/photo', [PageController::class, 'newsPhoto']);
 
-// ── Admin : vues ─────────────────────────────────────────────────────────
-Route::prefix('admin')->group(function () {
+// ── Authentification admin ────────────────────────────────────────────────
+Route::get('/admin/login',  [AuthController::class, 'loginPage']);
+Route::post('/admin/login', [AuthController::class, 'login']);
+Route::post('/admin/logout',[AuthController::class, 'logout']);
+
+// ── Admin : vues (protégées) ──────────────────────────────────────────────
+Route::prefix('admin')->middleware(AdminAuth::class)->group(function () {
     Route::get('/',             fn() => view('admin.dashboard'));
     Route::get('/hero',         [SiteController::class, 'heroIndex']);
     Route::get('/about',        [SiteController::class, 'aboutIndex']);
@@ -28,8 +35,8 @@ Route::prefix('admin')->group(function () {
     Route::get('/contact',      [SiteController::class, 'contactIndex']);
 });
 
-// ── Admin : API JSON ──────────────────────────────────────────────────────
-Route::prefix('admin/api')->group(function () {
+// ── Admin : API JSON (protégée) ───────────────────────────────────────────
+Route::prefix('admin/api')->middleware(AdminAuth::class)->group(function () {
 
     // Hero
     Route::get('/hero',  [SiteController::class, 'heroShow']);

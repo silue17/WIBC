@@ -904,6 +904,13 @@
                     <div class="sidebar-admin-role">WIBC · Super Admin</div>
                 </div>
             </div>
+            <form method="POST" action="/admin/logout" style="margin:0;">
+                @csrf
+                <button type="submit" title="Se déconnecter" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(243,66,68,0.08);border:1px solid rgba(243,66,68,0.15);border-radius:10px;color:#f87171;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.2s;margin-bottom:6px;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="collapse-label">Se déconnecter</span>
+                </button>
+            </form>
             <button class="collapse-btn" id="collapseBtn">
                 <i class="fas fa-chevron-left" id="collapseIcon"></i>
                 <span class="collapse-label">Réduire le menu</span>
