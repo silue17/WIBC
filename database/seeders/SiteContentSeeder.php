@@ -8,13 +8,13 @@ use App\Models\Service;
 use App\Models\TeamMember;
 use App\Models\Achievement;
 use App\Models\NewsArticle;
-use App\Models\GalleryItem;
 
 class SiteContentSeeder extends Seeder
 {
     public function run(): void
     {
-        // Hero
+        // ── Site Settings ─────────────────────────────────────────────────
+
         SiteSetting::set('hero', [
             'title'       => 'WORLD INNOVATIONS BUSINESS CONSULTING',
             'tagline'     => 'Une vision mondiale, un impact africain',
@@ -22,7 +22,6 @@ class SiteContentSeeder extends Seeder
             'btnText'     => 'Nous contacter',
         ]);
 
-        // About
         SiteSetting::set('about', [
             'title'        => "Transformer l'Afrique par l'innovation",
             'description1' => 'World Innovations Business Consulting (WIBC) est une société ivoirienne de conseil fondée par trois jeunes entrepreneurs visionnaires.',
@@ -30,59 +29,140 @@ class SiteContentSeeder extends Seeder
             'badge'        => '100% Ivoirien',
         ]);
 
-        // Contact
         SiteSetting::set('contact', [
-            'address' => 'Angré, Cocody, Abidjan',
-            'email'   => 'worldibconsulting@gmail.com',
-            'phone'   => '+225 07 12 70 01 67',
-            'rccm'    => 'CI-ABJ-03-2025-B12-04372',
+            'address'   => 'Angré, Cocody, Abidjan',
+            'email'     => 'worldibconsulting@gmail.com',
+            'phone'     => '+225 07 12 70 01 67',
+            'rccm'      => 'CI-ABJ-03-2025-B12-04372',
+            'map_lat'   => '5.391215471838068',
+            'map_lng'   => '-3.989660318834706',
+            'map_embed' => null,
         ]);
 
-        // Services
+        // ── Services ──────────────────────────────────────────────────────
+
         $services = [
-            ['name' => 'Strategy & Business',  'description' => 'Accompagner les structures dans leurs choix stratégiques et leur développement.'],
-            ['name' => 'Tech & Innovation',    'description' => 'Concevoir et déployer des projets technologiques et d\'innovation durable.'],
-            ['name' => 'Influence & Events',   'description' => 'Valoriser l\'image et développer des stratégies de visibilité et d\'influence.'],
+            [
+                'name'        => 'Strategy & Business',
+                'description' => 'Accompagner les structures dans leurs choix stratégiques et leur développement.',
+                'sort_order'  => 0,
+            ],
+            [
+                'name'        => 'Tech & Innovation',
+                'description' => 'Concevoir et déployer des projets technologiques et d\'innovation durable.',
+                'sort_order'  => 1,
+            ],
+            [
+                'name'        => 'Influence & Events',
+                'description' => 'Valoriser l\'image et développer des stratégies de visibilité et d\'influence.',
+                'sort_order'  => 2,
+            ],
         ];
-        foreach ($services as $i => $s) {
-            Service::create(array_merge($s, ['sort_order' => $i]));
+
+        foreach ($services as $s) {
+            Service::create($s);
         }
 
-        // Team
+        // ── Équipe ────────────────────────────────────────────────────────
+
         $team = [
-            ['name' => 'Miwouguih Secongo Clotchor',          'position' => 'Directeur Général',            'bio' => 'Passionné par le management et le développement des entreprises africaines.'],
-            ['name' => 'Johann Coulibaly',                    'position' => 'Directeur Général Adjoint',    'bio' => 'Expert en business et relations internationales.'],
-            ['name' => 'Ousmane Tidiane Aziz TOURÉ-DERUOTH',  'position' => 'Directeur Administratif et Financier', 'bio' => 'Expertise financière et structuration d\'entreprise.'],
+            [
+                'name'       => 'Miwouguih Secongo Clotchor',
+                'position'   => 'Directeur Général',
+                'bio'        => 'Passionné par le management et le développement des entreprises africaines.',
+                'photo'      => null,
+                'sort_order' => 0,
+            ],
+            [
+                'name'       => 'Johann Coulibaly',
+                'position'   => 'Directeur Général Adjoint',
+                'bio'        => 'Expert en business et relations internationales.',
+                'photo'      => null,
+                'sort_order' => 1,
+            ],
+            [
+                'name'       => 'Ousmane Tidiane Aziz TOURÉ-DERUOTH',
+                'position'   => 'Directeur Administratif et Financier',
+                'bio'        => 'Expertise financière et structuration d\'entreprise.',
+                'photo'      => null,
+                'sort_order' => 2,
+            ],
         ];
-        foreach ($team as $i => $m) {
-            TeamMember::create(array_merge($m, ['sort_order' => $i, 'photo' => null]));
+
+        foreach ($team as $m) {
+            TeamMember::create($m);
         }
 
-        // Achievements
+        // ── Réalisations ──────────────────────────────────────────────────
+
         $achievements = [
-            ['title' => 'African MMA League',     'category' => 'Sport',       'description' => 'Gestion de la billetterie et relations institutionnelles pour la ligue africaine.'],
-            ['title' => "Gestion d'image",         'category' => 'Carrière',    'description' => 'Accompagnement de Ruth Gbagbi, championne olympique de Taekwondo.'],
-            ['title' => 'Mise en relation B2B',    'category' => 'Partenariat', 'description' => 'Facilitation logistique pour Endeavour Mining.'],
-            ['title' => 'Trottinette Électrique',  'category' => 'Innovation',  'description' => 'Projet de mobilité durable à Abidjan.'],
+            [
+                'title'       => 'African MMA League',
+                'category'    => 'Sport',
+                'description' => 'Gestion de la billetterie et relations institutionnelles pour la ligue africaine.',
+                'photo'       => null,
+                'sort_order'  => 0,
+            ],
+            [
+                'title'       => "Gestion d'image",
+                'category'    => 'Carrière',
+                'description' => 'Accompagnement de Ruth Gbagbi, championne olympique de Taekwondo.',
+                'photo'       => null,
+                'sort_order'  => 1,
+            ],
+            [
+                'title'       => 'Mise en relation B2B',
+                'category'    => 'Partenariat',
+                'description' => 'Facilitation logistique pour Endeavour Mining.',
+                'photo'       => null,
+                'sort_order'  => 2,
+            ],
+            [
+                'title'       => 'Trottinette Électrique',
+                'category'    => 'Innovation',
+                'description' => 'Projet de mobilité durable à Abidjan.',
+                'photo'       => null,
+                'sort_order'  => 3,
+            ],
         ];
-        foreach ($achievements as $i => $a) {
-            Achievement::create(array_merge($a, ['sort_order' => $i]));
+
+        foreach ($achievements as $a) {
+            Achievement::create($a);
         }
 
-        // News
+        // ── Actualités ────────────────────────────────────────────────────
+
         $news = [
-            ['title' => "WIBC expansion Afrique de l'Ouest", 'date' => 'Mars 2025',    'description' => 'Une nouvelle ère pour le conseil stratégique en Côte d\'Ivoire et au-delà.'],
-            ['title' => 'African MMA League — record',        'date' => 'Février 2025', 'description' => '15 000 spectateurs ont assisté à l\'événement phare de la saison.'],
-            ['title' => 'Mobilité durable — phase pilote',    'date' => 'Janvier 2025', 'description' => 'Lancement officiel du projet de trottinettes électriques à Abidjan.'],
+            [
+                'title'       => "WIBC expansion Afrique de l'Ouest",
+                'date'        => 'Mars 2025',
+                'description' => "Une nouvelle ère pour le conseil stratégique en Côte d'Ivoire et au-delà.",
+                'photo'       => null,
+                'sort_order'  => 0,
+            ],
+            [
+                'title'       => 'African MMA League — record',
+                'date'        => 'Février 2025',
+                'description' => "15 000 spectateurs ont assisté à l'événement phare de la saison.",
+                'photo'       => null,
+                'sort_order'  => 1,
+            ],
+            [
+                'title'       => 'Mobilité durable — phase pilote',
+                'date'        => 'Janvier 2025',
+                'description' => 'Lancement officiel du projet de trottinettes électriques à Abidjan.',
+                'photo'       => null,
+                'sort_order'  => 2,
+            ],
         ];
-        foreach ($news as $i => $n) {
-            NewsArticle::create(array_merge($n, ['sort_order' => $i]));
+
+        foreach ($news as $n) {
+            NewsArticle::create($n);
         }
 
-        // Gallery
-        $photos = ['/photos/1.jpeg', '/photos/2.jpeg', '/photos/3.jpeg', '/photos/4.jpeg', '/photos/5.jpeg'];
-        foreach ($photos as $i => $url) {
-            GalleryItem::create(['url' => $url, 'sort_order' => $i]);
-        }
+        // ── Galerie ───────────────────────────────────────────────────────
+        // Les photos de la galerie sont des images uploadées via l'admin.
+        // Elles ne peuvent pas être incluses dans le seeder (trop volumineuses).
+        // Veuillez les uploader manuellement depuis /admin/gallery.
     }
 }
