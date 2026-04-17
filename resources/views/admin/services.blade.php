@@ -68,15 +68,15 @@
         return `
         <div class="field-group" style="margin-bottom:18px;">
             <label class="field-label"><i class="fas fa-tags"></i> Tags / Compétences</label>
-            <div class="tag-list" id="tagList">
-                ${features.map((f,i) => `
-                <span class="tag-item">
-                    ${escapeHtml(f)}
-                    <button type="button" onclick="removeTag(${i})"><i class="fas fa-times"></i></button>
-                </span>`).join('')}
-            </div>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:10px;">
+                <i class="fas fa-info-circle"></i> Tapez un tag puis appuyez sur <strong>Entrée</strong> ou la virgule <strong>,</strong> pour en ajouter plusieurs.
+            </p>
+            <div class="tag-list" id="tagList"></div>
             <div class="tag-input-wrap">
-                <input id="tagInput" class="field-input" placeholder="Ex: Gestion de carrière" style="font-size:0.85rem;">
+                <input id="tagInput" class="field-input"
+                    placeholder="Ex: Gestion de carrière, Conseil en image…"
+                    style="font-size:0.85rem;"
+                    onkeydown="handleTagKey(event)">
                 <button type="button" class="btn-primary" style="padding:0 14px;font-size:0.82rem;" onclick="addTag()">
                     <i class="fas fa-plus"></i> Ajouter
                 </button>
@@ -87,21 +87,36 @@
     function renderTagList() {
         const list = document.getElementById('tagList');
         if (!list) return;
-        list.innerHTML = pendingFeatures.map((f,i) => `
+        if (pendingFeatures.length === 0) {
+            list.innerHTML = '<span style="font-size:0.75rem;color:var(--text-muted);font-style:italic;">Aucun tag ajouté.</span>';
+            return;
+        }
+        list.innerHTML = pendingFeatures.map((f, i) => `
             <span class="tag-item">
                 ${escapeHtml(f)}
                 <button type="button" onclick="removeTag(${i})"><i class="fas fa-times"></i></button>
             </span>`).join('');
     }
 
+    function handleTagKey(event) {
+        if (event.key === 'Enter' || event.key === ',') {
+            event.preventDefault();
+            event.stopPropagation();
+            addTag();
+        }
+    }
+
     function addTag() {
         const input = document.getElementById('tagInput');
-        const val = input.value.trim();
-        if (!val) return;
-        if (!pendingFeatures.includes(val)) {
-            pendingFeatures.push(val);
-            renderTagList();
-        }
+        if (!input) return;
+        // Supporte plusieurs tags séparés par virgule
+        const vals = input.value.split(',').map(v => v.trim()).filter(v => v.length > 0);
+        vals.forEach(val => {
+            if (!pendingFeatures.includes(val)) {
+                pendingFeatures.push(val);
+            }
+        });
+        renderTagList();
         input.value = '';
         input.focus();
     }
@@ -146,11 +161,7 @@
                 } catch(e) { showToast(e.message, 'error'); }
             });
 
-        // Permettre Entrée pour ajouter un tag
-        setTimeout(() => {
-            const input = document.getElementById('tagInput');
-            if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } });
-        }, 60);
+        setTimeout(() => renderTagList(), 60);
     }
 
     async function deleteItem(id) {
