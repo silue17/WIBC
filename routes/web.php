@@ -55,6 +55,7 @@ Route::prefix('admin/api')->middleware(AdminAuth::class)->group(function () {
     // Contact
     Route::get('/contact', [SiteController::class, 'contactShow']);
     Route::put('/contact', [SiteController::class, 'contactUpdate']);
+    Route::put('/contact/social', [SiteController::class, 'socialUpdate']);
 
     // Services
     Route::get('/services',              [ServiceController::class, 'index']);

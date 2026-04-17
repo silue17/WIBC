@@ -96,7 +96,10 @@ class SiteController extends Controller
 
     public function contactShow()
     {
-        return response()->json(SiteSetting::get('contact', [
+        $contact = SiteSetting::get('contact', []);
+        $social  = SiteSetting::get('social_links', []);
+
+        return response()->json(array_merge([
             'address'   => 'Angré, Cocody, Abidjan',
             'email'     => 'worldibconsulting@gmail.com',
             'phone'     => '+225 07 12 70 01 67',
@@ -104,6 +107,36 @@ class SiteController extends Controller
             'map_lat'   => null,
             'map_lng'   => null,
             'map_embed' => null,
+        ], $contact, [
+            'social_facebook'  => $social['facebook']  ?? '',
+            'social_instagram' => $social['instagram'] ?? '',
+            'social_twitter'   => $social['twitter']   ?? '',
+            'social_linkedin'  => $social['linkedin']  ?? '',
+            'social_youtube'   => $social['youtube']   ?? '',
+            'social_tiktok'    => $social['tiktok']    ?? '',
         ]));
+    }
+
+    public function socialUpdate(Request $request)
+    {
+        $data = $request->validate([
+            'social_facebook'  => 'nullable|url|max:500',
+            'social_instagram' => 'nullable|url|max:500',
+            'social_twitter'   => 'nullable|url|max:500',
+            'social_linkedin'  => 'nullable|url|max:500',
+            'social_youtube'   => 'nullable|url|max:500',
+            'social_tiktok'    => 'nullable|url|max:500',
+        ]);
+
+        SiteSetting::set('social_links', [
+            'facebook'  => $data['social_facebook']  ?? '',
+            'instagram' => $data['social_instagram'] ?? '',
+            'twitter'   => $data['social_twitter']   ?? '',
+            'linkedin'  => $data['social_linkedin']  ?? '',
+            'youtube'   => $data['social_youtube']   ?? '',
+            'tiktok'    => $data['social_tiktok']    ?? '',
+        ]);
+
+        return response()->json(['ok' => true]);
     }
 }

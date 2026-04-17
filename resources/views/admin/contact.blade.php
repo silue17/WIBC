@@ -142,6 +142,50 @@
 <input type="hidden" id="mapLat" value="">
 <input type="hidden" id="mapLng" value="">
 
+<!-- Réseaux sociaux -->
+<div class="editor-card" style="margin-top:20px;">
+    <div class="editor-card-header">
+        <div class="editor-card-title">
+            <div class="editor-card-icon" style="background:rgba(243,66,68,0.10);color:#F34244;">
+                <i class="fas fa-share-alt"></i>
+            </div>
+            <div>
+                <div class="editor-card-label">Réseaux sociaux</div>
+                <div class="editor-card-sub">Liens affichés dans le footer du site</div>
+            </div>
+        </div>
+        <button id="saveSocialBtn" class="btn-primary"><i class="fas fa-save"></i> Publier</button>
+    </div>
+    <div class="editor-card-body">
+        <div class="form-grid">
+            <div class="field-group">
+                <label class="field-label"><i class="fab fa-facebook-f" style="color:#1877f2;"></i> Facebook</label>
+                <input id="socialFacebook" class="field-input" type="url" placeholder="https://facebook.com/wibc">
+            </div>
+            <div class="field-group">
+                <label class="field-label"><i class="fab fa-instagram" style="color:#e1306c;"></i> Instagram</label>
+                <input id="socialInstagram" class="field-input" type="url" placeholder="https://instagram.com/wibc">
+            </div>
+            <div class="field-group">
+                <label class="field-label"><i class="fab fa-twitter" style="color:#1a8cd8;"></i> Twitter / X</label>
+                <input id="socialTwitter" class="field-input" type="url" placeholder="https://twitter.com/wibc">
+            </div>
+            <div class="field-group">
+                <label class="field-label"><i class="fab fa-linkedin-in" style="color:#0077b5;"></i> LinkedIn</label>
+                <input id="socialLinkedin" class="field-input" type="url" placeholder="https://linkedin.com/company/wibc">
+            </div>
+            <div class="field-group">
+                <label class="field-label"><i class="fab fa-youtube" style="color:#ff0000;"></i> YouTube</label>
+                <input id="socialYoutube" class="field-input" type="url" placeholder="https://youtube.com/@wibc">
+            </div>
+            <div class="field-group">
+                <label class="field-label"><i class="fab fa-tiktok" style="color:#000;"></i> TikTok</label>
+                <input id="socialTiktok" class="field-input" type="url" placeholder="https://tiktok.com/@wibc">
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -152,6 +196,14 @@
         document.getElementById('contactEmail').value   = data.email   ?? '';
         document.getElementById('contactPhone').value   = data.phone   ?? '';
         document.getElementById('contactRccm').value    = data.rccm    ?? '';
+
+        // Réseaux sociaux
+        document.getElementById('socialFacebook').value  = data.social_facebook  ?? '';
+        document.getElementById('socialInstagram').value = data.social_instagram ?? '';
+        document.getElementById('socialTwitter').value   = data.social_twitter   ?? '';
+        document.getElementById('socialLinkedin').value  = data.social_linkedin  ?? '';
+        document.getElementById('socialYoutube').value   = data.social_youtube   ?? '';
+        document.getElementById('socialTiktok').value    = data.social_tiktok    ?? '';
 
         document.getElementById('previewAddr').textContent  = data.address ?? '';
         document.getElementById('previewEmail').textContent = data.email   ?? '';
@@ -301,6 +353,27 @@
 
     document.getElementById('saveMapBtn').onclick = () => {
         document.getElementById('saveContactBtn').click();
+    };
+
+    // ── Sauvegarde réseaux sociaux ─────────────────────────────────────────
+    document.getElementById('saveSocialBtn').onclick = async () => {
+        const btn = document.getElementById('saveSocialBtn');
+        btn.disabled = true;
+        try {
+            await api('PUT', '/admin/api/contact/social', {
+                social_facebook:  document.getElementById('socialFacebook').value.trim(),
+                social_instagram: document.getElementById('socialInstagram').value.trim(),
+                social_twitter:   document.getElementById('socialTwitter').value.trim(),
+                social_linkedin:  document.getElementById('socialLinkedin').value.trim(),
+                social_youtube:   document.getElementById('socialYoutube').value.trim(),
+                social_tiktok:    document.getElementById('socialTiktok').value.trim(),
+            });
+            showToast('Réseaux sociaux mis à jour');
+        } catch(e) {
+            showToast('Erreur : ' + e.message, 'error');
+        } finally {
+            btn.disabled = false;
+        }
     };
 </script>
 @endsection

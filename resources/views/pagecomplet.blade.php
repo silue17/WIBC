@@ -2180,10 +2180,24 @@ function fmtDate($d) {
                     </a>
                     <p class="footer-description">World Innovations Business Consulting est une société ivoirienne de conseil fondée par trois jeunes entrepreneurs visionnaires. Une vision mondiale, un impact africain.</p>
                     <div class="footer-social">
-                        <a href="#" class="social-btn" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" class="social-btn" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="social-btn" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="social-btn" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        @if(!empty($social['facebook']))
+                        <a href="{{ $social['facebook'] }}" target="_blank" rel="noopener" class="social-btn" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        @endif
+                        @if(!empty($social['instagram']))
+                        <a href="{{ $social['instagram'] }}" target="_blank" rel="noopener" class="social-btn" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        @endif
+                        @if(!empty($social['twitter']))
+                        <a href="{{ $social['twitter'] }}" target="_blank" rel="noopener" class="social-btn" aria-label="Twitter / X"><i class="fab fa-twitter"></i></a>
+                        @endif
+                        @if(!empty($social['linkedin']))
+                        <a href="{{ $social['linkedin'] }}" target="_blank" rel="noopener" class="social-btn" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        @endif
+                        @if(!empty($social['youtube']))
+                        <a href="{{ $social['youtube'] }}" target="_blank" rel="noopener" class="social-btn" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        @endif
+                        @if(!empty($social['tiktok']))
+                        <a href="{{ $social['tiktok'] }}" target="_blank" rel="noopener" class="social-btn" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                        @endif
                     </div>
                 </div>
                 <div class="footer-col">

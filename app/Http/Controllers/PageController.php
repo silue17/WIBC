@@ -81,10 +81,11 @@ class PageController extends Controller
         $achievements = Achievement::orderBy('sort_order')->get();
         $news         = NewsArticle::orderBy('sort_order')->get();
         $gallery      = GalleryItem::orderBy('sort_order')->get();
+        $social       = SiteSetting::get('social_links', []);
 
         return view('pagecomplet', compact(
             'hero', 'about', 'contact',
-            'services', 'team', 'achievements', 'news', 'gallery'
+            'services', 'team', 'achievements', 'news', 'gallery', 'social'
         ));
     }
 }
