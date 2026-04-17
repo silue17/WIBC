@@ -1880,6 +1880,13 @@ function fmtDate($d) {
                     <div class="service-icon-wrap"><i class="fas fa-chart-line"></i></div>
                     <h3>{{ $service->name }}</h3>
                     <p>{{ $service->description }}</p>
+                    @if(!empty($service->features) && count($service->features) > 0)
+                    <ul class="service-features">
+                        @foreach($service->features as $feature)
+                        <li>{{ $feature }}</li>
+                        @endforeach
+                    </ul>
+                    @endif
                     <a href="#contact" class="service-btn">Voir plus <i class="fas fa-arrow-right"></i></a>
                 </div>
                 @empty

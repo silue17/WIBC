@@ -18,6 +18,8 @@ class ServiceController extends Controller
         $data = $request->validate([
             'name'        => 'required|string|max:300',
             'description' => 'nullable|string|max:2000',
+            'features'    => 'nullable|array',
+            'features.*'  => 'string|max:100',
         ]);
 
         $data['sort_order'] = Service::max('sort_order') + 1;
@@ -31,11 +33,13 @@ class ServiceController extends Controller
         $data = $request->validate([
             'name'        => 'required|string|max:300',
             'description' => 'nullable|string|max:2000',
+            'features'    => 'nullable|array',
+            'features.*'  => 'string|max:100',
         ]);
 
         $service->update($data);
 
-        return response()->json($service);
+        return response()->json($service->fresh());
     }
 
     public function destroy(Service $service)

@@ -6,5 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
-    protected $fillable = ['name', 'description', 'sort_order'];
+    protected $fillable = ['name', 'description', 'features', 'sort_order'];
+
+    protected $casts = ['features' => 'array'];
 }
