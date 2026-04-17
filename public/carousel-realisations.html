@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Réalisations — Carrousel Circulaire</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --border:    #30363d;
+      --accent:    #58a6ff;
+      --accent2:   #3fb950;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --radius:    16px;
+      --card-w:    280px;
+      --card-h:    340px;
+      --orbit-r:   320px;   /* rayon du cercle sur desktop */
+      --transition: 700ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    /* ─── Section Header ───────────────────────────────────────── */
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .section-header .label {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .section-header h2 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+    .section-header h2 span {
+      background: linear-gradient(135deg, var(--accent), #bf91f3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .section-header p {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 500px;
+      margin-inline: auto;
+      line-height: 1.6;
+    }
+
+    /* ─── Carousel Wrapper ─────────────────────────────────────── */
+    .carousel-section {
+      width: 100%;
+      padding: 20px 0 60px;
+    }
+
+    .carousel-scene {
+      position: relative;
+      width: 100%;
+      height: calc(var(--card-h) + var(--orbit-r) * 0.9);
+      perspective: 1200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .carousel-orbit {
+      position: relative;
+      width: var(--card-w);
+      height: var(--card-h);
+      transform-style: preserve-3d;
+      /* JS gère la rotation */
+      transition: transform var(--transition);
+    }
+
+    /* ─── Card ─────────────────────────────────────────────────── */
+    .card {
+      position: absolute;
+      top: 0; left: 0;
+      width: var(--card-w);
+      height: var(--card-h);
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow:
+        0 4px 6px rgba(0,0,0,0.3),
+        0 20px 60px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+      overflow: hidden;
+      cursor: pointer;
+      transition:
+        filter var(--transition),
+        opacity var(--transition),
+        transform var(--transition),
+        box-shadow var(--transition);
+      /* position sur l'orbite définie par JS via transform */
+      backface-visibility: hidden;
+    }
+
+    .card.active {
+      filter: blur(0);
+      opacity: 1;
+      box-shadow:
+        0 0 0 2px var(--accent),
+        0 20px 80px rgba(88, 166, 255, 0.25),
+        0 40px 120px rgba(0,0,0,0.6);
+      z-index: 10;
+    }
+
+    .card:not(.active) {
+      filter: blur(2.5px);
+      opacity: 0.55;
+    }
+
+    /* Gradient cover de la carte */
+    .card-cover {
+      width: 100%;
+      height: 140px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-cover-bg {
+      width: 100%;
+      height: 100%;
+      transition: transform 400ms ease;
+    }
+    .card:hover .card-cover-bg {
+      transform: scale(1.05);
+    }
+    .card-cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 50%, var(--surface));
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .card-body {
+      padding: 18px 20px 20px;
+    }
+    .card-category {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+    .card-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 16px;
+    }
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tag {
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: rgba(88, 166, 255, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(88, 166, 255, 0.2);
+    }
+    .card-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-stat {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .card-stat strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+    .card-link {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: gap 200ms ease;
+    }
+    .card-link:hover { gap: 8px; }
+    .card-link svg { width: 12px; height: 12px; }
+
+    /* ─── Navigation ───────────────────────────────────────────── */
+    .carousel-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 32px;
+    }
+    .nav-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 200ms, border-color 200ms, transform 150ms;
+      flex-shrink: 0;
+    }
+    .nav-btn:hover {
+      background: rgba(88, 166, 255, 0.15);
+      border-color: var(--accent);
+      transform: scale(1.08);
+    }
+    .nav-btn:active { transform: scale(0.95); }
+    .nav-btn svg { width: 20px; height: 20px; }
+
+    /* Dots */
+    .dots {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      cursor: pointer;
+      transition: background 300ms, width 300ms, border-radius 300ms;
+    }
+    .dot.active {
+      background: var(--accent);
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    /* ─── Progress Bar ─────────────────────────────────────────── */
+    .progress-bar {
+      width: 200px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 16px auto 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      transform-origin: left;
+      animation: progress var(--auto-duration, 3s) linear infinite;
+    }
+    @keyframes progress {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+    .progress-fill.paused { animation-play-state: paused; }
+
+    /* ─── Ambient glow ─────────────────────────────────────────── */
+    .ambient {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.15;
+    }
+    .ambient-1 {
+      width: 600px; height: 600px;
+      background: var(--accent);
+      top: -200px; left: -200px;
+    }
+    .ambient-2 {
+      width: 500px; height: 500px;
+      background: #bf91f3;
+      bottom: -150px; right: -150px;
+    }
+
+    /* ─── Responsive ────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      :root {
+        --orbit-r: 240px;
+        --card-w:  240px;
+        --card-h:  300px;
+      }
+    }
+    @media (max-width: 600px) {
+      :root {
+        --orbit-r: 180px;
+        --card-w:  210px;
+        --card-h:  270px;
+      }
+      .carousel-scene {
+        height: calc(var(--card-h) + var(--orbit-r) * 1.1);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Ambient glow -->
+<div class="ambient ambient-1"></div>
+<div class="ambient ambient-2"></div>
+
+<!-- Section Header -->
+<header class="section-header">
+  <p class="label">Portfolio</p>
+  <h2>Nos <span>Réalisations</span></h2>
+  <p>Découvrez les projets qui illustrent notre expertise et notre créativité.</p>
+</header>
+
+<!-- Carousel -->
+<section class="carousel-section">
+  <div class="carousel-scene" id="scene">
+    <div class="carousel-orbit" id="orbit">
+      <!-- Cards injectées par JS -->
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="carousel-nav">
+    <button class="nav-btn" id="btnPrev" aria-label="Précédent">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+
+    <div class="dots" id="dots"></div>
+
+    <button class="nav-btn" id="btnNext" aria-label="Suivant">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </button>
+  </nav>
+</section>
+
+<script>
+/* ───────────────────────────────────────────────
+   DATA — 8 réalisations
+─────────────────────────────────────────────── */
+const PROJECTS = [
+  {
+    category: "Web App",
+    title: "Plateforme SaaS Analytics",
+    desc: "Dashboard temps réel avec visualisation de données avancée et IA prédictive intégrée.",
+    tags: ["React", "Node.js", "D3.js"],
+    stat: { label: "Utilisateurs", value: "12k+" },
+    badge: { text: "Production", color: "#3fb950", bg: "rgba(63,185,80,0.15)" },
+    gradient: ["#1a2744", "#0d3b6e", "#1e4080"],
+    icon: "📊"
+  },
+  {
+    category: "Mobile",
+    title: "App Fintech Cross-Platform",
+    desc: "Application de gestion financière personnelle avec scan de factures et budget automatique.",
+    tags: ["Flutter", "Firebase", "Dart"],
+    stat: { label: "Téléchargements", value: "48k" },
+    badge: { text: "App Store", color: "#58a6ff", bg: "rgba(88,166,255,0.15)" },
+    gradient: ["#0e2233", "#0a3347", "#123d57"],
+    icon: "💳"
+  },
+  {
+    category: "E-commerce",
+    title: "Boutique Luxury Brand",
+    desc: "Expérience d'achat immersive avec essayage virtuel 3D et paiement en 1 clic.",
+    tags: ["Next.js", "Shopify", "Three.js"],
+    stat: { label: "Conversion", value: "+38%" },
+    badge: { text: "Primé", color: "#f0883e", bg: "rgba(240,136,62,0.15)" },
+    gradient: ["#2a1a0e", "#3d2310", "#4d2e15"],
+    icon: "🛍️"
+  },
+  {
+    category: "IA & Données",
+    title: "Moteur de Recommandation",
+    desc: "Algorithme ML personnalisé pour maximiser l'engagement et la rétention utilisateur.",
+    tags: ["Python", "TensorFlow", "FastAPI"],
+    stat: { label: "Précision", value: "94.7%" },
+    badge: { text: "ML", color: "#bf91f3", bg: "rgba(191,145,243,0.15)" },
+    gradient: ["#1a1030", "#251548", "#2e1a5c"],
+    icon: "🤖"
+  },
+  {
+    category: "Identité Visuelle",
+    title: "Rebranding Corporate",
+    desc: "Refonte complète de l'identité visuelle d'un groupe international dans 14 pays.",
+    tags: ["Figma", "Motion", "Design System"],
+    stat: { label: "Pays", value: "14" },
+    badge: { text: "Award", color: "#e3b341", bg: "rgba(227,179,65,0.15)" },
+    gradient: ["#1e1505", "#2e1f07", "#3a2808"],
+    icon: "🎨"
+  },
+  {
+    category: "IoT / Infra",
+    title: "Smart Building Platform",
+    desc: "Système de gestion intelligent des bâtiments : énergie, sécurité, confort en temps réel.",
+    tags: ["MQTT", "Go", "InfluxDB"],
+    stat: { label: "Énergie économisée", value: "−31%" },
+    badge: { text: "IoT", color: "#3fb950", bg: "rgba(63,185,80,0.15)" },
+    gradient: ["#0a200a", "#0d2e0d", "#103810"],
+    icon: "🏢"
+  },
+  {
+    category: "Blockchain",
+    title: "NFT Marketplace",
+    desc: "Place de marché décentralisée pour artistes numériques avec royalties automatiques.",
+    tags: ["Solidity", "Ethers.js", "IPFS"],
+    stat: { label: "Volume", value: "2.4M€" },
+    badge: { text: "Web3", color: "#58a6ff", bg: "rgba(88,166,255,0.15)" },
+    gradient: ["#0a1520", "#0d1e2e", "#10273d"],
+    icon: "🔗"
+  },
+  {
+    category: "Formation",
+    title: "LMS Interactif",
+    desc: "Plateforme e-learning gamifiée avec parcours adaptatifs et certificats blockchain.",
+    tags: ["Vue.js", "Laravel", "WebRTC"],
+    stat: { label: "Apprenants", value: "8 500" },
+    badge: { text: "EdTech", color: "#f0883e", bg: "rgba(240,136,62,0.15)" },
+    gradient: ["#1f0e1a", "#2e1126", "#3a1530"],
+    icon: "🎓"
+  }
+];
+
+/* ───────────────────────────────────────────────
+   CONFIG
+─────────────────────────────────────────────── */
+const AUTO_INTERVAL = 3000; // ms entre chaque rotation
+let currentIndex = 0;
+let autoTimer = null;
+let isPaused = false;
+
+const orbit      = document.getElementById('orbit');
+const scene      = document.getElementById('scene');
+const dotsEl     = document.getElementById('dots');
+const progressFill = document.getElementById('progressFill');
+const N          = PROJECTS.length;
+
+/* ───────────────────────────────────────────────
+   BUILD CARDS
+─────────────────────────────────────────────── */
+function buildCard(p, index) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.index = index;
+
+  const [c1, c2, c3] = p.gradient;
+  card.innerHTML = `
+    <div class="card-cover">
+      <div class="card-cover-bg" style="background: linear-gradient(135deg, ${c1}, ${c2}, ${c3}); display:flex; align-items:center; justify-content:center; font-size: 3.5rem;">
+        ${p.icon}
+      </div>
+      <div class="card-cover-overlay"></div>
+      <span class="card-badge" style="color:${p.badge.color}; background:${p.badge.bg}; border:1px solid ${p.badge.color}33">
+        ${p.badge.text}
+      </span>
+    </div>
+    <div class="card-body">
+      <p class="card-category">${p.category}</p>
+      <h3 class="card-title">${p.title}</h3>
+      <p class="card-desc">${p.desc}</p>
+      <div class="card-tags">
+        ${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="card-stat">${p.stat.label} : <strong>${p.stat.value}</strong></div>
+      <a href="#" class="card-link">
+        Voir
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+    </div>`;
+
+  card.addEventListener('click', () => {
+    if (parseInt(card.dataset.index) !== currentIndex) {
+      const diff = parseInt(card.dataset.index) - currentIndex;
+      // Aller au plus court chemin
+      const half = N / 2;
+      if (diff > half)       rotateTo(currentIndex - (N - diff));
+      else if (diff < -half) rotateTo(currentIndex + (N + diff));
+      else                   rotateTo(parseInt(card.dataset.index));
+    }
+  });
+
+  return card;
+}
+
+/* Injecter les cartes */
+PROJECTS.forEach((p, i) => orbit.appendChild(buildCard(p, i)));
+
+/* ───────────────────────────────────────────────
+   BUILD DOTS
+─────────────────────────────────────────────── */
+PROJECTS.forEach((_, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dot.addEventListener('click', () => rotateTo(i));
+  dotsEl.appendChild(dot);
+});
+
+function updateDots() {
+  dotsEl.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i === ((currentIndex % N + N) % N));
+  });
+}
+
+/* ───────────────────────────────────────────────
+   POSITION CALCULATION  (3D orbit)
+─────────────────────────────────────────────── */
+function getOrbitRadius() {
+  return parseFloat(getComputedStyle(document.documentElement)
+    .getPropertyValue('--orbit-r').trim()) || 320;
+}
+
+function positionCards() {
+  const R    = getOrbitRadius();
+  const cards = orbit.querySelectorAll('.card');
+  const normalized = ((currentIndex % N) + N) % N;
+
+  cards.forEach((card, i) => {
+    // angle en radians : élément actif = haut (−π/2 = -90°)
+    // on étale les cartes autour du cercle
+    const rawAngle  = (i - normalized) * (2 * Math.PI / N);
+    // décalage pour que l'actif soit devant (z max)
+    const angle = rawAngle;   // 0 = avant
+
+    const x  = R * Math.sin(angle);   // horizontal
+    const z  = R * Math.cos(angle);   // profondeur
+    const y  = -R * 0.18 * (1 - Math.cos(angle)); // léger arc vertical
+
+    // Scale & opacité selon la profondeur (z normalisé entre -1 et 1)
+    const depthNorm = Math.cos(angle); // 1 = avant, -1 = arrière
+    const scale   = 0.6 + 0.4 * ((depthNorm + 1) / 2);   // 0.6 → 1.0
+    const opacity = depthNorm > 0 ? 1 : 0.3 + 0.3 * ((depthNorm + 1) / 2);
+
+    const isActive = i === normalized;
+
+    card.classList.toggle('active', isActive);
+    card.dataset.index = i;  // toujours synchro
+
+    card.style.transform = `
+      translate3d(
+        calc(-50% + ${x}px),
+        calc(-50% + ${y}px),
+        ${z}px
+      )
+      scale(${scale})
+    `;
+    card.style.zIndex  = Math.round((depthNorm + 1) * 50);
+    card.style.opacity = isActive ? '1' : String(Math.max(0.3, opacity));
+    card.style.filter  = isActive ? 'blur(0)' : `blur(${(1 - depthNorm) * 2.5}px)`;
+    card.style.pointerEvents = isActive ? 'auto' : (depthNorm > 0.1 ? 'auto' : 'none');
+  });
+}
+
+/* ───────────────────────────────────────────────
+   ROTATION
+─────────────────────────────────────────────── */
+function rotateTo(target) {
+  currentIndex = target;
+  positionCards();
+  updateDots();
+  restartProgress();
+}
+
+function next() { rotateTo(currentIndex + 1); }
+function prev() { rotateTo(currentIndex - 1); }
+
+/* ───────────────────────────────────────────────
+   AUTO-PLAY
+─────────────────────────────────────────────── */
+function startAuto() {
+  stopAuto();
+  autoTimer = setInterval(() => {
+    if (!isPaused) next();
+  }, AUTO_INTERVAL);
+}
+function stopAuto() {
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+}
+
+/* Progress bar restart */
+function restartProgress() {
+  progressFill.style.animation = 'none';
+  // force reflow
+  void progressFill.offsetWidth;
+  progressFill.style.animation = '';
+  progressFill.style.animationDuration = AUTO_INTERVAL + 'ms';
+  document.documentElement.style.setProperty('--auto-duration', AUTO_INTERVAL + 'ms');
+}
+
+/* ───────────────────────────────────────────────
+   CONTROLS
+─────────────────────────────────────────────── */
+document.getElementById('btnPrev').addEventListener('click', () => { prev(); });
+document.getElementById('btnNext').addEventListener('click', () => { next(); });
+
+/* Pause on hover */
+scene.addEventListener('mouseenter', () => {
+  isPaused = true;
+  progressFill.classList.add('paused');
+});
+scene.addEventListener('mouseleave', () => {
+  isPaused = false;
+  progressFill.classList.remove('paused');
+});
+
+/* Touch support */
+let touchStartX = 0;
+scene.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+}, { passive: true });
+scene.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 40) dx < 0 ? next() : prev();
+}, { passive: true });
+
+/* Keyboard */
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft')  prev();
+  if (e.key === 'ArrowRight') next();
+});
+
+/* Resize */
+window.addEventListener('resize', positionCards);
+
+/* ───────────────────────────────────────────────
+   INIT
+─────────────────────────────────────────────── */
+positionCards();
+startAuto();
+restartProgress();
+</script>
+</body>
+</html>
