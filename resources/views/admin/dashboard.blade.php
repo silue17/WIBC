@@ -32,20 +32,35 @@
 <!-- Bottom row: Chart + Quick Access -->
 <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:start;">
 
-    <!-- Chart -->
+    <!-- Content Overview -->
     <div class="editor-card" style="margin-bottom:0;">
         <div class="editor-card-header">
             <div class="editor-card-title">
-                <div class="editor-card-icon"><i class="fas fa-chart-area"></i></div>
+                <div class="editor-card-icon"><i class="fas fa-layer-group"></i></div>
                 <div>
-                    <div class="editor-card-label">Performance globale</div>
-                    <div class="editor-card-sub">Activité des 6 derniers mois</div>
+                    <div class="editor-card-label">Répartition du contenu</div>
+                    <div class="editor-card-sub">Vue d'ensemble des sections publiées</div>
                 </div>
             </div>
-            <span class="badge badge-green"><i class="fas fa-arrow-up"></i> +18%</span>
+            <span class="badge badge-navy" id="totalContentBadge">— éléments</span>
         </div>
-        <div class="editor-card-body">
-            <canvas id="activityChart" height="160"></canvas>
+        <div class="editor-card-body" style="padding:20px 24px;">
+
+            <!-- Donut + légende -->
+            <div style="display:flex;align-items:center;gap:28px;">
+                <div style="position:relative;flex-shrink:0;">
+                    <canvas id="donutChart" width="140" height="140"></canvas>
+                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+                        <div id="donutTotal" style="font-size:1.6rem;font-weight:900;color:var(--text-primary);line-height:1;">—</div>
+                        <div style="font-size:0.65rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">total</div>
+                    </div>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:10px;" id="donutLegend"></div>
+            </div>
+
+            <!-- Barres de progression -->
+            <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border-light);display:flex;flex-direction:column;gap:10px;" id="progressBars"></div>
+
         </div>
     </div>
 
@@ -99,59 +114,95 @@
             else el.textContent = cur;
         }, 30);
     }
+    // Donut chart — vraies données
+    const SECTIONS = [
+        { label: 'Pôles',        color: '#047847', key: 'services'     },
+        { label: 'Équipe',       color: '#07102a', key: 'team'         },
+        { label: 'Réalisations', color: '#e8392a', key: 'achievements' },
+        { label: 'Actualités',   color: '#05a35f', key: 'news'         },
+    ];
+
     Promise.all([
         api('GET', '/admin/api/services'),
         api('GET', '/admin/api/team'),
         api('GET', '/admin/api/achievements'),
         api('GET', '/admin/api/news'),
     ]).then(([services, team, achievements, news]) => {
-        animNum('statServices', services.length);
-        animNum('statTeam',     team.length);
-        animNum('statAch',      achievements.length);
-        animNum('statNews',     news.length);
+        const counts = { services: services.length, team: team.length, achievements: achievements.length, news: news.length };
+
+        animNum('statServices', counts.services);
+        animNum('statTeam',     counts.team);
+        animNum('statAch',      counts.achievements);
+        animNum('statNews',     counts.news);
+
+        const total = Object.values(counts).reduce((a,b)=>a+b, 0);
+        document.getElementById('donutTotal').textContent = total;
+        document.getElementById('totalContentBadge').textContent = `${total} éléments`;
+
+        // Légende
+        const legend = document.getElementById('donutLegend');
+        legend.innerHTML = SECTIONS.map(s => {
+            const n   = counts[s.key];
+            const pct = total > 0 ? Math.round(n / total * 100) : 0;
+            return `
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="width:10px;height:10px;border-radius:50%;background:${s.color};flex-shrink:0;display:block;"></span>
+                <span style="flex:1;font-size:0.8rem;color:var(--text-secondary);font-weight:500;">${s.label}</span>
+                <span style="font-size:0.82rem;font-weight:700;color:var(--text-primary);">${n}</span>
+                <span style="font-size:0.72rem;color:var(--text-muted);min-width:32px;text-align:right;">${pct}%</span>
+            </div>`;
+        }).join('');
+
+        // Barres de progression
+        const bars = document.getElementById('progressBars');
+        bars.innerHTML = SECTIONS.map(s => {
+            const n   = counts[s.key];
+            const pct = total > 0 ? Math.round(n / total * 100) : 0;
+            return `
+            <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                    <span style="font-size:0.73rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;">${s.label}</span>
+                    <span style="font-size:0.73rem;font-weight:700;color:var(--text-primary);">${n} élément${n>1?'s':''}</span>
+                </div>
+                <div style="height:6px;border-radius:999px;background:var(--border-light);overflow:hidden;">
+                    <div style="height:100%;width:${pct}%;background:${s.color};border-radius:999px;transition:width 0.8s cubic-bezier(0.2,0,0,1);"></div>
+                </div>
+            </div>`;
+        }).join('');
+
+        // Donut chart
+        const ctx = document.getElementById('donutChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels:   SECTIONS.map(s => s.label),
+                datasets: [{
+                    data:            SECTIONS.map(s => counts[s.key] || 0.01),
+                    backgroundColor: SECTIONS.map(s => s.color),
+                    borderWidth:     3,
+                    borderColor:     getComputedStyle(document.documentElement).getPropertyValue('--surface') || '#fff',
+                    hoverOffset:     6,
+                }]
+            },
+            options: {
+                cutout: '70%',
+                responsive: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ` ${ctx.label} : ${counts[SECTIONS[ctx.dataIndex].key]} élément(s)`
+                        }
+                    }
+                }
+            }
+        });
+
     }).catch(() => {
         ['statServices','statTeam','statAch','statNews'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.textContent = '—';
         });
-    });
-
-    // Chart
-    const isDark = document.body.classList.contains('dark');
-    const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(7,16,42,0.05)';
-    const tickColor = isDark ? '#7e8aa2' : '#6c7a91';
-
-    const ctx = document.getElementById('activityChart').getContext('2d');
-    const grad = ctx.createLinearGradient(0,0,0,200);
-    grad.addColorStop(0, 'rgba(4,120,71,0.18)');
-    grad.addColorStop(1, 'rgba(4,120,71,0)');
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Jan','Fév','Mar','Avr','Mai','Juin'],
-            datasets: [{
-                label: 'Activité',
-                data: [320, 480, 620, 810, 970, 1150],
-                borderColor: '#047847',
-                backgroundColor: grad,
-                tension: 0.42,
-                fill: true,
-                pointBackgroundColor: '#fff',
-                pointBorderColor: '#047847',
-                pointBorderWidth: 2.5,
-                pointRadius: 5,
-                pointHoverRadius: 7,
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-            scales: {
-                y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 } }, border: { display: false } },
-                x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 11 } }, border: { display: false } }
-            }
-        }
     });
 </script>
 @endsection
