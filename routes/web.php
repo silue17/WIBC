@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Admin\AuthController;
+
 use App\Http\Controllers\Admin\SiteController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\TeamController;
@@ -33,10 +34,15 @@ Route::prefix('admin')->middleware(AdminAuth::class)->group(function () {
     Route::get('/news',         fn() => view('admin.news'));
     Route::get('/gallery',      fn() => view('admin.gallery'));
     Route::get('/contact',      [SiteController::class, 'contactIndex']);
+    Route::get('/settings',     fn() => view('admin.settings'));
 });
 
 // ── Admin : API JSON (protégée) ───────────────────────────────────────────
 Route::prefix('admin/api')->middleware(AdminAuth::class)->group(function () {
+
+    // Paramètres / identifiants
+    Route::get('/settings/credentials',  [AuthController::class, 'credentialsShow']);
+    Route::post('/settings/credentials', [AuthController::class, 'credentialsUpdate']);
 
     // Hero
     Route::get('/hero',  [SiteController::class, 'heroShow']);

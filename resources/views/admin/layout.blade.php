@@ -887,6 +887,12 @@
                 <span class="nav-label">Contact</span>
             </a>
 
+            <div class="nav-section-label">Compte</div>
+            <a href="/admin/settings" class="nav-link {{ request()->is('admin/settings') ? 'active' : '' }}">
+                <span class="nav-link-icon"><i class="fas fa-cog"></i></span>
+                <span class="nav-label">Paramètres</span>
+            </a>
+
             <div class="nav-section-label">Site web</div>
             <a href="/" target="_blank" class="nav-link">
                 <span class="nav-link-icon"><i class="fas fa-external-link-alt"></i></span>
