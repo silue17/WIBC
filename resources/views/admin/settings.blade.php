@@ -22,35 +22,24 @@
             <input id="sEmail" type="email" class="field-input" value="" placeholder="admin@wibc.ci">
         </div>
 
-        <!-- Mot de passe actuel -->
-        <div class="field-group" style="margin-bottom:18px;">
-            <label class="field-label"><i class="fas fa-lock"></i> Mot de passe actuel</label>
-            <div style="position:relative;">
-                <input id="sCurrentPw" type="password" class="field-input" placeholder="••••••••" style="padding-right:44px;">
-                <button type="button" onclick="togglePw('sCurrentPw','icon1')" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;">
-                    <i class="fas fa-eye" id="icon1"></i>
-                </button>
-            </div>
-        </div>
-
         <!-- Nouveau mot de passe -->
         <div class="field-group" style="margin-bottom:18px;">
             <label class="field-label"><i class="fas fa-key"></i> Nouveau mot de passe <span style="color:var(--text-muted);font-weight:400;">(laisser vide pour ne pas changer)</span></label>
             <div style="position:relative;">
                 <input id="sNewPw" type="password" class="field-input" placeholder="••••••••" style="padding-right:44px;">
-                <button type="button" onclick="togglePw('sNewPw','icon2')" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;">
-                    <i class="fas fa-eye" id="icon2"></i>
+                <button type="button" onclick="togglePw('sNewPw','icon1')" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;">
+                    <i class="fas fa-eye" id="icon1"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Confirmer nouveau mot de passe -->
+        <!-- Confirmer mot de passe -->
         <div class="field-group" style="margin-bottom:28px;">
-            <label class="field-label"><i class="fas fa-check-circle"></i> Confirmer le nouveau mot de passe</label>
+            <label class="field-label"><i class="fas fa-check-circle"></i> Confirmer le mot de passe</label>
             <div style="position:relative;">
                 <input id="sConfirmPw" type="password" class="field-input" placeholder="••••••••" style="padding-right:44px;">
-                <button type="button" onclick="togglePw('sConfirmPw','icon3')" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;">
-                    <i class="fas fa-eye" id="icon3"></i>
+                <button type="button" onclick="togglePw('sConfirmPw','icon2')" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;">
+                    <i class="fas fa-eye" id="icon2"></i>
                 </button>
             </div>
         </div>
@@ -65,7 +54,6 @@
 
 @section('scripts')
 <script>
-    // Charger l'email actuel
     async function loadCredentials() {
         try {
             const data = await api('GET', '/admin/api/settings/credentials');
@@ -75,12 +63,10 @@
 
     async function saveCredentials() {
         const email     = document.getElementById('sEmail').value.trim();
-        const currentPw = document.getElementById('sCurrentPw').value;
         const newPw     = document.getElementById('sNewPw').value;
         const confirmPw = document.getElementById('sConfirmPw').value;
 
         if (!email) { showToast('Email requis', 'error'); return; }
-        if (!currentPw) { showToast('Mot de passe actuel requis', 'error'); return; }
         if (newPw && newPw !== confirmPw) { showToast('Les mots de passe ne correspondent pas', 'error'); return; }
         if (newPw && newPw.length < 6) { showToast('Mot de passe trop court (min 6 caractères)', 'error'); return; }
 
@@ -90,12 +76,10 @@
 
         try {
             await api('POST', '/admin/api/settings/credentials', {
-                email:      email,
-                current_pw: currentPw,
-                new_pw:     newPw || null,
+                email:  email,
+                new_pw: newPw || null,
             });
             showToast('Identifiants mis à jour avec succès');
-            document.getElementById('sCurrentPw').value = '';
             document.getElementById('sNewPw').value = '';
             document.getElementById('sConfirmPw').value = '';
         } catch(e) {

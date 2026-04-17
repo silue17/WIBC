@@ -67,17 +67,11 @@ class AuthController extends Controller
     public function credentialsUpdate(Request $request)
     {
         $request->validate([
-            'email'      => 'required|email',
-            'current_pw' => 'required|string',
-            'new_pw'     => 'nullable|string|min:6',
+            'email'  => 'required|email',
+            'new_pw' => 'nullable|string|min:6',
         ]);
 
         $creds = $this->getCredentials();
-
-        // Vérifier le mot de passe actuel
-        if ($request->current_pw !== $creds['password']) {
-            return response()->json(['message' => 'Mot de passe actuel incorrect.'], 422);
-        }
 
         SiteSetting::set('admin_credentials', [
             'email'    => $request->email,
